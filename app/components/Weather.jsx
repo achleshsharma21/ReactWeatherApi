@@ -7,20 +7,39 @@ var Weather = React.createClass({
 
     getInitialState(){
         return{
-            cityname: 'Miami',
-            temp: 88
+            isLoading: false
         }
 
     },
 
-    handleSearch(cityname){
+    handleSearch: function (cityname) {
+    var that = this;
+
+    this.setState({isLoading: true});
+
+    openWeatherMap.getTemp(cityname).then(function (temp) {
+      that.setState({
+        cityname: cityname,
+        temp: temp,
+        isLoading: false
+      });
+    }, function (errorMessage) {
+      that.setState({isLoading: false});
+      alert(errorMessage);
+    });
+  },
+
+    handleSearch1(cityname){
         var that=this;
+        this.setState({isLoading: true});
         openWeatherMap.getTemp(cityname).then(function(temp){
             that.setState({
                 cityname: cityname,
-                temp: temp
+                temp: temp,
+                isLoading: false
             });
         }, function(errorMessage){
+            that.setState({isLoading: false});
             alert(errorMessage);
         })
         /*this.setState({
@@ -30,12 +49,21 @@ var Weather = React.createClass({
     },
 
     render(){
-        var {temp , cityname} = this.state;
+        var {isLoading, temp , cityname} = this.state;
+
+        function renderMessage(){
+            if(isLoading){
+                return <h3>Fetching Weather..</h3>
+            }
+            else if(temp && cityname) {
+                return  <WeatherMessage temp={temp} cityname={cityname}/>;
+            }
+        }
         return(
             <div>
             <h3>Get Weather</h3>
             <WeatherForm onSearch={this.handleSearch}/>
-            <WeatherMessage temp={temp} cityname={cityname}/>
+            {renderMessage()}
             </div>
         );
     }

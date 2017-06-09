@@ -24934,18 +24934,39 @@
 	    displayName: 'Weather',
 	    getInitialState: function getInitialState() {
 	        return {
-	            cityname: 'Miami',
-	            temp: 88
+	            isLoading: false
 	        };
 	    },
+
+
 	    handleSearch: function handleSearch(cityname) {
 	        var that = this;
+
+	        this.setState({ isLoading: true });
+
 	        openWeatherMap.getTemp(cityname).then(function (temp) {
 	            that.setState({
 	                cityname: cityname,
-	                temp: temp
+	                temp: temp,
+	                isLoading: false
 	            });
 	        }, function (errorMessage) {
+	            that.setState({ isLoading: false });
+	            alert(errorMessage);
+	        });
+	    },
+
+	    handleSearch1: function handleSearch1(cityname) {
+	        var that = this;
+	        this.setState({ isLoading: true });
+	        openWeatherMap.getTemp(cityname).then(function (temp) {
+	            that.setState({
+	                cityname: cityname,
+	                temp: temp,
+	                isLoading: false
+	            });
+	        }, function (errorMessage) {
+	            that.setState({ isLoading: false });
 	            alert(errorMessage);
 	        }
 	        /*this.setState({
@@ -24956,9 +24977,22 @@
 	    },
 	    render: function render() {
 	        var _state = this.state,
+	            isLoading = _state.isLoading,
 	            temp = _state.temp,
 	            cityname = _state.cityname;
 
+
+	        function renderMessage() {
+	            if (isLoading) {
+	                return React.createElement(
+	                    'h3',
+	                    null,
+	                    'Fetching Weather..'
+	                );
+	            } else if (temp && cityname) {
+	                return React.createElement(WeatherMessage, { temp: temp, cityname: cityname });
+	            }
+	        }
 	        return React.createElement(
 	            'div',
 	            null,
@@ -24968,7 +25002,7 @@
 	                'Get Weather'
 	            ),
 	            React.createElement(WeatherForm, { onSearch: this.handleSearch }),
-	            React.createElement(WeatherMessage, { temp: temp, cityname: cityname })
+	            renderMessage()
 	        );
 	    }
 	});
@@ -25060,26 +25094,26 @@
 
 	var axios = __webpack_require__(222);
 
-	var OPEN_WEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather?appid=423a0dddd656fddb2e9bdc700f0d3059&units=imperial';
+	var OPEN_WEATHER_MAP_URL = 'http://api.openweathermap.org/data/2.5/weather?appid=423a0dddd656fddb2e9bdc700f0d3059&units=imperial';
 
 	//423a0dddd656fddb2e9bdc700f0d3059;
 
 
 	module.exports = {
-	    getTemp: function getTemp(cityname) {
-	        var encodedLocation = encodeURIComponent(cityname);
-	        var requestUrl = OPEN_WEATHERMAP_URL + '&q=' + encodedLocation;
+	  getTemp: function getTemp(location) {
+	    var encodedLocation = encodeURIComponent(location);
+	    var requestUrl = OPEN_WEATHER_MAP_URL + '&q=' + encodedLocation;
 
-	        return axios.get(requestUrl).then(function (res) {
-	            if (res.data.cod && res.data.message) {
-	                throw new Error(res.data.message);
-	            } else {
-	                return res.data.main.temp;
-	            }
-	        }, function (res) {
-	            throw new Error(res.data.message);
-	        });
-	    }
+	    return axios.get(requestUrl).then(function (res) {
+	      if (res.data.cod && res.data.message) {
+	        throw new Error(res.data.message);
+	      } else {
+	        return res.data.main.temp;
+	      }
+	    }, function (res) {
+	      throw new Error('Unable to fetch weather');
+	    });
+	  }
 	};
 
 /***/ },
