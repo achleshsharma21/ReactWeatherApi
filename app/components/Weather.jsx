@@ -12,8 +12,9 @@ var Weather = React.createClass({
 
     },
 
-    handleSearch: function (cityname) {
+    handleSearch(cityname) {
     var that = this;
+    //debugger;
 
     this.setState({isLoading: true});
 
@@ -29,24 +30,6 @@ var Weather = React.createClass({
     });
   },
 
-    handleSearch1(cityname){
-        var that=this;
-        this.setState({isLoading: true});
-        openWeatherMap.getTemp(cityname).then(function(temp){
-            that.setState({
-                cityname: cityname,
-                temp: temp,
-                isLoading: false
-            });
-        }, function(errorMessage){
-            that.setState({isLoading: false});
-            alert(errorMessage);
-        })
-        /*this.setState({
-           cityname: cityname,
-           temp: 23 
-        });*/
-    },
 
     render(){
         var {isLoading, temp , cityname} = this.state;
